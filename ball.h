@@ -17,11 +17,10 @@ public:
     double dt;
     double gravity;
     int id;
-    bool outofbound(int x, int y);
+    int isOver;
+    int xsize,ysize;
     void ballUpdate();
-    void anglerandomizer();
-    bool coordsHasChanged();
-    ball(int number);
+    ball(int angX, int angY);
     ~ball();
 };
 

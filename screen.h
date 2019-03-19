@@ -1,7 +1,8 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
-#include "Allballs.h"
+#include <vector>
+#include "ball.h"
 
 class screen
 {
@@ -15,7 +16,7 @@ public:
     void drawScreen();
     void printSymbol(int x, int y);
     void clearPreviousSymbol(int x, int y);
-    void updateScreen(Allballs* ballsvector) ;
+    void updateScreen(std::vector <ball*> balls) ;
 };
 
 #endif

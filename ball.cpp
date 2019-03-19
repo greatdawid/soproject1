@@ -2,30 +2,12 @@
 #include "ncurses.h"
 #include <cstdlib>
 
-bool ball::outofbound(int x, int y){
-    int xsize,ysize = 0;
-    bool outofscreen = false;
-    //getting terminal size
-    getmaxyx(stdscr,ysize,xsize);
-    if ( x <= 0 || x >= xsize|| y <= 0 || y >= ysize ) {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    
-}
 
 void ball::ballUpdate(){
-    int xsize,ysize = 0;
-    //getting terminal size
-    getmaxyx(stdscr,ysize,xsize);
-
+ 
     int tmpX = this->currentX;
     int tmpY = this->currentY;
 
-  //  while(true){
 
             if (tmpX + angleX > xsize -2) {
                 tmpX = xsize -2;
@@ -39,9 +21,7 @@ void ball::ballUpdate(){
             
             else
             {
-                //angleX = gravity *dt;
-                tmpX = tmpX +angleX ;
-               // angleX +=angleX *dt + 0.5*gravity *dt*dt;
+               tmpX = tmpX +angleX ;
             }
 
             
@@ -66,16 +46,13 @@ void ball::ballUpdate(){
             if ((tmpY == oldY) && (currentY == ysize -2)) {
                 counter++;
             }
+            //this if is responsible for stopping ball when ball is on ground
             if (counter >3) {
                 angleX = 0;
+                //isOver flag indicated that ball wont move in any direction, we can stop using updateBall function
+                isOver = true;
             }
             
-          //  if (!outofbound(tmpX,tmpY)) {
-        //        //exiting while loop
-  //              break;
-            //}
-        
-   // }
     oldX = currentX;
     oldY = currentY;
     currentX = tmpX;
@@ -83,36 +60,38 @@ void ball::ballUpdate(){
 
 }
 
-void ball::anglerandomizer(){
-    int tmpX,tmpY;
-   do
-   {
-        angleX = rand()%2-1;        
-        //    tmpX = 0;
-        //    tmpY = 1;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             tmpX = rand()%2-1;
-        angleY = rand()%2-1;
-  } while ((tmpX == -1 && tmpY == -1) || (tmpX == 0 && tmpY == -1) || (tmpX == 1 && tmpY == -1) || (tmpX == 0 && tmpY == 0));
-}
+// ball::ball(int number){
+//     int yScreen = 0,xScreen = 0;
+//     getmaxyx(stdscr,yScreen,xScreen);
+//     this->currentX = xScreen/2;
+//     this->currentY = yScreen/2;
+//     //starting direction
+//     this->angleX = -2;
+//     this->angleY = 1;
+//     //anglerandomizer();
+//     this->id = number;
+//     this->oldX = 0;
+//     this->oldY = 0;
+//     this->gravity = 5.0;
+//     this->dt = 0.2;
+//     this->counter = 0;
+//   //  this->isOver = false;
 
-bool ball::coordsHasChanged(){
-    return currentX != oldX || currentY != oldY; 
-     }
-
-ball::ball(int number){
-    int yScreen = 0,xScreen = 0;
-    getmaxyx(stdscr,yScreen,xScreen);
-    this->currentX = xScreen/2;
-    this->currentY = yScreen/2;
+// }
+ball::ball(int angX, int angY){
+    //getting terminal size
+    getmaxyx(stdscr,this->ysize,this->xsize);
+    this->currentX = xsize/2;
+    this->currentY = ysize/2;
     //starting direction
-    this->angleX = -2;
-    this->angleY = 15;
+    this->angleX = angX;
+    this->angleY = angY;;
     //anglerandomizer();
-    this->id = number;
     this->oldX = 0;
     this->oldY = 0;
     this->gravity = 5.0;
     this->dt = 0.2;
     this->counter = 0;
-  //  this->isOver = false;
+    this->isOver = false;
 
 }

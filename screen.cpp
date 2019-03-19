@@ -1,10 +1,10 @@
 #include <iostream>
 #include <ncurses.h>
+#include <vector>
 #include "screen.h"
-#include "Allballs.h"
 
 screen::~screen(){
-
+    endwin();
 }
 
 screen::screen(){
@@ -49,12 +49,22 @@ void screen::drawScreen(){
     refresh();
 }
 
-void screen::updateScreen(Allballs *ballsvector){
-    for(int i = 0; i < ballsvector->numberofballs; i++)
+// void screen::updateScreen(Allballs *ballsvector){
+//     for(int i = 0; i < ballsvector->numberofballs; i++)
+//     {
+//             //printing symbols
+//             clearPreviousSymbol(ballsvector->ballsInScreen[i]->oldX,ballsvector->ballsInScreen[i]->oldY);
+//             printSymbol(ballsvector->ballsInScreen[i]->currentX, ballsvector->ballsInScreen[i]->currentY);
+        
+//     }
+//     refresh();
+// }
+void screen::updateScreen(std::vector <ball*> balls){
+    for(int i = 0; i < balls.size(); i++)
     {
             //printing symbols
-            clearPreviousSymbol(ballsvector->ballsInScreen[i]->oldX,ballsvector->ballsInScreen[i]->oldY);
-            printSymbol(ballsvector->ballsInScreen[i]->currentX, ballsvector->ballsInScreen[i]->currentY);
+            clearPreviousSymbol(balls[i]->oldX,balls[i]->oldY);
+            printSymbol(balls[i]->currentX, balls[i]->currentY);
         
     }
     refresh();
