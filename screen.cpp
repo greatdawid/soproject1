@@ -4,7 +4,6 @@
 #include "screen.h"
 
 screen::~screen(){
-    endwin();
 }
 
 screen::screen(){
@@ -15,11 +14,9 @@ screen::screen(){
 
 void screen::prepareScreen(){
     initscr();
-    // clear();
     noecho();
     // invisble cursor is set
     curs_set(0);
-    refresh();
 }
 
 void screen::printSymbol(int x, int y){
@@ -49,23 +46,19 @@ void screen::drawScreen(){
     refresh();
 }
 
-// void screen::updateScreen(Allballs *ballsvector){
-//     for(int i = 0; i < ballsvector->numberofballs; i++)
-//     {
-//             //printing symbols
-//             clearPreviousSymbol(ballsvector->ballsInScreen[i]->oldX,ballsvector->ballsInScreen[i]->oldY);
-//             printSymbol(ballsvector->ballsInScreen[i]->currentX, ballsvector->ballsInScreen[i]->currentY);
-        
-//     }
-//     refresh();
-// }
 void screen::updateScreen(std::vector <ball*> balls){
+
     for(int i = 0; i < balls.size(); i++)
     {
+        
             //printing symbols
             clearPreviousSymbol(balls[i]->oldX,balls[i]->oldY);
             printSymbol(balls[i]->currentX, balls[i]->currentY);
-        
+            if (balls[i]->isOver) {
+                //balls are disapering
+                clearPreviousSymbol(balls[i]->currentX,balls[i]->currentY);
+            }  
+        refresh();
     }
-    refresh();
+    
 }

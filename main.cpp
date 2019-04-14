@@ -4,36 +4,86 @@
 #include <thread>
 #include <unistd.h>
 #include "screen.h"
+#include <mutex>
+#include <condition_variable>
 
 bool isRunning = true;
 screen *Screen; 
-//Allballs *ballsvector;
-std::vector <ball *> balls;
+
+std::vector <ball*> balls;
+std::vector<std::thread> ballsthreads;
+std::mutex mu;
+std::condition_variable cond;
+int ballsLocked = 0;
 
 void exitfunction(){
     while(isRunning){
-        char key = getchar();
+        char key = getch();
         if(key == 'q')
         isRunning = false;
     }
 }
+//to do comprare coords
+bool isNear(int b1x,int b1y, int b2x, int b2y){
+
+    if (abs(b1x-b2x) <= 1 && abs(b1y-b2y) <=1) {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+    
+}
+void checkingCollision(int number){
+
+    for(int i = 0; i < balls.size(); i++ )
+    {
+        if (i == number) continue; 
+        
+        int x = balls[i]->currentX;
+        int y = balls[i]->currentY;
+        if (isNear(x,y,balls[number]->currentX, balls[number]->currentY)) {
+            // collision code is here
+            balls[i]->isInContact = true;
+            balls[number] -> isInContact = true;
+        }
+    }  
+}
 
 void ballThreadFunction(int ballId){
- 
     while(isRunning){
         usleep(50000);
-        balls[ballId]->ballUpdate();
+        //probably mutex here
+  //      mu.lock();
+        checkingCollision(ballId);
+ //       mu.unlock();
+        if(balls[ballId]->isInContact){
+            // //smth like double speed for a balls in contact
+           // mu.lock();
+           // ballsLocked++;
+           //mu.unlock();
+        balls[ballId]->isInContact = false;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+            
+           // ballsLocked--;
+        }
+        else{
+        //not sure about this
+        //balls[ballId] -> isInContact = false;
+        balls[ballId] -> ballUpdate();
         //isOver means ball wont move in any direction so calling ballUpdate is pointless
         if(balls[ballId]->isOver) break;
+        }
     }
     //chanigng x and y position
 }
 
-
 int randAngleY(){
     int tmp=0;
 
-    tmp=rand()%10+5;
+    tmp=rand()%10-10;
     return tmp;
 }
 
@@ -46,44 +96,78 @@ int randAngleX(){
     return tmp;
 }
 
+// (b1x==b2x && b1y==b2y) || (b1x==b2x-1 && b1y ==b2y) || (b1x == b2x-1 && b1y ==b2y-1) || 
+//         (b1x == b2y && b1y == b2y -1) || (b1x == b2x +1 && b1y == b2y+1) ||
+void isCollision(std::vector<ball*> balls){
+
+    for(int i = 0; i < balls.size(); i++)
+    {
+
+        int x = balls[i]->currentX;
+        int y = balls[i]->currentY;
+        for(int j = 0; j < balls.size(); j++)
+        {
+            if(i==j) continue;
+           // if(isNear(x,y, balls[j]->currentX, balls[j]->currentY))           
+            
+            
+        }
+        
+
+}
+
+
+}
+
 void updateScreenFunction(){
 
     while(isRunning){
-        usleep(10000);
+        //microseconds
+        usleep(4000);
         Screen->updateScreen(balls);
     }
     //destroying Screen object
     delete Screen;
 }
 
+void ballsInMotion(){
+    int i=0;
+    while(isRunning){
+        ball *tmpball = new ball(randAngleX(),randAngleY());
+        balls.push_back(tmpball);
+        ballsthreads.push_back(std::thread(ballThreadFunction,i));
+        sleep(3);
+        i++;
+        if(!isRunning) return;
+    }   
+} 
+
+void checkthread(){
+    while(isRunning){
+        
+    }
+    
+}
+
 int main(){
     
     
     Screen = new screen();
-  //  Screen = new screen();
-   // ballsvector = new Allballs();
     srand(time(NULL));
-    std::vector<std::thread> ballsthreads;
+
     std::thread screenThread(updateScreenFunction);
     std::thread exitThread(exitfunction);
+    std::thread ballThread(ballsInMotion);
 
-    for(int i=0;i<5;i++){
-        ball *tmpball = new ball(randAngleX(),randAngleY());
-        balls.push_back(tmpball);
-        ballsthreads.push_back(std::thread(ballThreadFunction,i));
-        sleep(1);
-        if(!isRunning) break;
-    }
+//threads are working
 
-    
-
+    ballThread.join();
     screenThread.join();
     exitThread.join();
-    endwin();
      for(int i = 0; i < ballsthreads.size(); i++)
     {
          ballsthreads[i].join();
     }
-    
+    endwin();
     return 0;
 }

@@ -14,14 +14,14 @@ void ball::ballUpdate(){
                 angleX = -angleX;
             }
             //probably left border is 1
-            if ( tmpX + angleX < 1) {
+            else if ( tmpX + angleX < 1) {
                 tmpX = 1;
                 angleX = -angleX; //reversing direction
             }
             
             else
             {
-               tmpX = tmpX +angleX ;
+               tmpX = tmpX +angleX;
             }
 
             
@@ -32,7 +32,7 @@ void ball::ballUpdate(){
                 angleY = -angleY;
             }
             //probably left border is 1
-            if ( tmpY + angleY < 1) {
+            else if ( tmpY + angleY < 1) {
                 tmpY = 1;
                 angleY = -angleY; //reversing direction
             }
@@ -46,12 +46,12 @@ void ball::ballUpdate(){
             if ((tmpY == oldY) && (currentY == ysize -2)) {
                 counter++;
             }
-            //this if is responsible for stopping ball when ball is on ground
-            if (counter >3) {
-                angleX = 0;
-                //isOver flag indicated that ball wont move in any direction, we can stop using updateBall function
-                isOver = true;
-            }
+            // //this if is responsible for stopping ball when ball is on ground
+            // if (counter >3) {
+            //     angleX = 0;
+            //     //isOver flag indicates that ball wont move in any direction, we can stop using updateBall function
+            //     isOver = true;
+            // }
             
     oldX = currentX;
     oldY = currentY;
@@ -60,24 +60,6 @@ void ball::ballUpdate(){
 
 }
 
-// ball::ball(int number){
-//     int yScreen = 0,xScreen = 0;
-//     getmaxyx(stdscr,yScreen,xScreen);
-//     this->currentX = xScreen/2;
-//     this->currentY = yScreen/2;
-//     //starting direction
-//     this->angleX = -2;
-//     this->angleY = 1;
-//     //anglerandomizer();
-//     this->id = number;
-//     this->oldX = 0;
-//     this->oldY = 0;
-//     this->gravity = 5.0;
-//     this->dt = 0.2;
-//     this->counter = 0;
-//   //  this->isOver = false;
-
-// }
 ball::ball(int angX, int angY){
     //getting terminal size
     getmaxyx(stdscr,this->ysize,this->xsize);
@@ -86,12 +68,12 @@ ball::ball(int angX, int angY){
     //starting direction
     this->angleX = angX;
     this->angleY = angY;;
-    //anglerandomizer();
     this->oldX = 0;
     this->oldY = 0;
     this->gravity = 5.0;
     this->dt = 0.2;
     this->counter = 0;
     this->isOver = false;
+    this->isInContact = false;
 
 }
