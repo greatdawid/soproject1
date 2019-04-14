@@ -28,7 +28,7 @@ void ball::ballUpdate(){
             if (tmpY + angleY > ysize -2) {
                 tmpY = ysize -2;
                 //this is added
-                angleY *= 0.99;
+                //angleY *= 0.99;
                 angleY = -angleY;
             }
             //probably left border is 1
@@ -46,12 +46,12 @@ void ball::ballUpdate(){
             if ((tmpY == oldY) && (currentY == ysize -2)) {
                 counter++;
             }
-            // //this if is responsible for stopping ball when ball is on ground
-            // if (counter >3) {
-            //     angleX = 0;
-            //     //isOver flag indicates that ball wont move in any direction, we can stop using updateBall function
-            //     isOver = true;
-            // }
+            //this if is responsible for stopping ball when ball is on ground
+            if (counter >3) {
+                angleX = 0;
+                //isOver flag indicates that ball wont move in any direction, we can stop using updateBall function
+                isOver = true;
+            }
             
     oldX = currentX;
     oldY = currentY;

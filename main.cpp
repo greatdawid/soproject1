@@ -14,7 +14,7 @@ std::vector <ball*> balls;
 std::vector<std::thread> ballsthreads;
 std::mutex mu;
 std::condition_variable cond;
-int ballsLocked = 0;
+int ballsInSleep = 0;
 
 void exitfunction(){
     while(isRunning){
@@ -36,7 +36,7 @@ bool isNear(int b1x,int b1y, int b2x, int b2y){
     
     
 }
-void checkingCollision(int number){
+void checkingCollision(int number, int & lastContact){
 
     for(int i = 0; i < balls.size(); i++ )
     {
@@ -44,37 +44,60 @@ void checkingCollision(int number){
         
         int x = balls[i]->currentX;
         int y = balls[i]->currentY;
-        if (isNear(x,y,balls[number]->currentX, balls[number]->currentY)) {
+        if (isNear(x,y,balls[number]->currentX, balls[number]->currentY) && !(number ==lastContact)) {
             // collision code is here
             balls[i]->isInContact = true;
             balls[number] -> isInContact = true;
+            lastContact = number;
         }
     }  
 }
 
+bool sleepAllowed(int ballId)
+{   
+    if (balls[ballId]->isInContact && ballsInSleep < 2) {
+         ballsInSleep++;
+         return true;
+    }
+    else
+    {
+        return false;
+    }
+      
+}
+
 void ballThreadFunction(int ballId){
+    int internalCounter = 3;
+    int lastContact = -1;
     while(isRunning){
+
         usleep(50000);
-        //probably mutex here
-  //      mu.lock();
-        checkingCollision(ballId);
- //       mu.unlock();
-        if(balls[ballId]->isInContact){
+        internalCounter--;
+        if(internalCounter < 0) lastContact = -1;
+//probably mutex here
+        mu.lock();
+        checkingCollision(ballId, lastContact);
+      //  mu.unlock();
+
+        if(sleepAllowed(ballId)){
             // //smth like double speed for a balls in contact
-           // mu.lock();
-           // ballsLocked++;
-           //mu.unlock();
-        balls[ballId]->isInContact = false;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+            // mu.lock();
+            // ballsLocked++;
+            balls[ballId]->isInContact = false;
+            mu.unlock();
             
-           // ballsLocked--;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            balls[ballId] -> ballUpdate();
+            ballsInSleep--;
         }
         else{
-        //not sure about this
-        //balls[ballId] -> isInContact = false;
-        balls[ballId] -> ballUpdate();
-        //isOver means ball wont move in any direction so calling ballUpdate is pointless
-        if(balls[ballId]->isOver) break;
+            
+            //not sure about this
+            balls[ballId] -> isInContact = false;
+            mu.unlock();
+            balls[ballId] -> ballUpdate();
+            //isOver means ball wont move in any direction so calling ballUpdate is pointless
+            if(balls[ballId]->isOver) break;
         }
     }
     //chanigng x and y position
@@ -123,7 +146,7 @@ void updateScreenFunction(){
 
     while(isRunning){
         //microseconds
-        usleep(4000);
+        usleep(1000);
         Screen->updateScreen(balls);
     }
     //destroying Screen object
